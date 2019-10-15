@@ -14,51 +14,68 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "USERS", schema = "quora")
+@Table(name = "users", schema = "quora")
 @NamedQueries({
         @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email = :email")
 })
 public class UserEntity implements Serializable {
 
     @Id
-    @Column(name = "ID")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "UUID")
+    @Column(name = "uuid")
     @Size(max = 64)
     private String uuid;
 
-    @Column(name = "ROLE")
+    @Column(name = "role")
     private String role;
 
-    @Column(name = "EMAIL")
+    @Column(name = "email")
     @NotNull
     @Size(max = 200)
     private String email;
 
-    @Column(name = "PASSWORD")
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "FIRST_NAME")
+    @Column(name = "firstName")
     @NotNull
     @Size(max = 200)
     private String firstName;
 
-    @Column(name = "LAST_NAME")
+    @Column(name = "userName")
+    @NotNull
+    @Size(max = 200)
+    private String userName;
+
+    @Column(name = "lastName")
     @NotNull
     @Size(max = 200)
     private String lastName;
 
-    @Column(name = "CONTACT_NUMBER")
+    @Column(name = "aboutMe")
+    @NotNull
+    @Size(max = 200)
+    private String aboutMe;
+
+    @Column(name = "country")
+    @NotNull
+    @Size(max = 200)
+    private String country;
+
+    @Column(name = "contactNumber")
     @NotNull
     @Size(max = 50)
     private String contactNumber;
 
-    @Column(name = "LAST_LOGIN_AT")
-    private ZonedDateTime lastLoginAt;
+    @Column(name = "dob")
+    @NotNull
+    @Size(max = 50)
+    private String dob;
 
-    @Column(name = "SALT")
+    @Column(name = "salt")
     @NotNull
     @Size(max = 200)
     private String salt;
@@ -112,6 +129,14 @@ public class UserEntity implements Serializable {
         this.firstName = firstName;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public String getLastName() {
         return lastName;
     }
@@ -120,24 +145,41 @@ public class UserEntity implements Serializable {
         this.lastName = lastName;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
     public String getContactNumber() {
         return contactNumber;
+    }
+
+    public String getAboutMe() {
+        return aboutMe;
+    }
+
+    public void setAboutMe(String aboutMe) {
+        this.aboutMe = aboutMe;
     }
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
 
-    public ZonedDateTime getLastLoginAt() {
-        return lastLoginAt;
-    }
-
-    public void setLastLoginAt(ZonedDateTime lastLoginAt) {
-        this.lastLoginAt = lastLoginAt;
-    }
 
     public String getSalt() {
         return salt;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
     }
 
     public void setSalt(String salt) {
@@ -152,10 +194,12 @@ public class UserEntity implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(this).hashCode();
+      //  return 1;
     }
 
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+     //   return "test";
     }
 }

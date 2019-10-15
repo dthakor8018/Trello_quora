@@ -19,4 +19,6 @@ spring:
       hibernate:
         temp:
           use_jdbc_metadata_defaults: false
+          namingStrategy: org.hibernate.cfg.DefaultNamingStrategy
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+

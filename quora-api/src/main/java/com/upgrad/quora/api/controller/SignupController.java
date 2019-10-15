@@ -25,16 +25,24 @@ public class SignupController {
     @RequestMapping(method = RequestMethod.POST, path = "/usersignup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupUserResponse> userSignup(final SignupUserRequest signupUserRequest) {
 
-        final UserEntity userEntity = new UserEntity();
+        UserEntity userEntity = new UserEntity();
+
+        System.out.println("signupUserRequest...." + signupUserRequest.toString());
 
         userEntity.setUuid(UUID.randomUUID().toString());
         userEntity.setFirstName(signupUserRequest.getFirstName());
         userEntity.setLastName(signupUserRequest.getLastName());
+        userEntity.setUserName(signupUserRequest.getUserName());
+        userEntity.setAboutMe(signupUserRequest.getAboutMe());
+        userEntity.setDob(signupUserRequest.getDob());
         userEntity.setEmail(signupUserRequest.getEmailAddress());
         userEntity.setPassword(signupUserRequest.getPassword());
+        userEntity.setCountry(signupUserRequest.getCountry());
         userEntity.setContactNumber(signupUserRequest.getContactNumber());
         userEntity.setSalt("1234abc");
         userEntity.setRole("nonadmin");
+
+        System.out.println("userEntity...." + userEntity);
 
         final UserEntity createdUserEntity = signupBusinessService.signup(userEntity);
         SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
