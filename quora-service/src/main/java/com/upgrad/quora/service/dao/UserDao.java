@@ -18,9 +18,13 @@ public class UserDao {
     private EntityManager entityManager;
 
     public UserEntity createUser(UserEntity userEntity) {
-        System.out.println("UserDao..."+userEntity);
+        System.out.println("UserDao..." + userEntity);
         entityManager.persist(userEntity);
-        return userEntity;
+        try {
+            return userEntity;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public UserEntity getUserByEmail(final String email) {

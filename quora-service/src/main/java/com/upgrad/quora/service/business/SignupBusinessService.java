@@ -18,11 +18,16 @@ public class SignupBusinessService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity signup(UserEntity userEntity) {
-        System.out.println("SignupBusinessService..."+userEntity);
+        System.out.println("SignupBusinessService..." + userEntity);
         String[] encryptedText = passwordCryptographyProvider.encrypt(userEntity.getPassword());
         userEntity.setSalt(encryptedText[0]);
         userEntity.setPassword(encryptedText[1]);
-        System.out.println("SignupBusinessService after..."+userEntity);
-        return userDao.createUser(userEntity);
+
+        try {
+            return userDao.createUser(userEntity);
+        } catch (Exception e) {
+            System.out.println("error after..." + e);
+            return userEntity;
+        }
     }
 }

@@ -44,8 +44,16 @@ public class SignupController {
 
         System.out.println("userEntity...." + userEntity);
 
-        final UserEntity createdUserEntity = signupBusinessService.signup(userEntity);
-        SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
-        return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
+
+        SignupUserResponse userResponse = null;
+        try {
+            final UserEntity createdUserEntity = signupBusinessService.signup(userEntity);
+            userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
+            return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
+        } catch (Exception e) {
+            userResponse = new SignupUserResponse().status("user already exist");
+            return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CONFLICT);
+        }
+
     }
 }
