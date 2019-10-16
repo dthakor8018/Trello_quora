@@ -12,10 +12,10 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "IMAGES", schema = "imagehoster")
+@Table(name = "USERS", schema = "quora")
 @NamedQueries({
-        @NamedQuery(name = "ImageEntityByUuid", query = "select i from ImageEntity i where i.uuid = :uuid"),
-        @NamedQuery(name = "ImageEntityByid", query = "select i from ImageEntity i where i.id = :id")
+        @NamedQuery(name = "UserEntityByUuid", query = "select i from UserEntity i where i.uuid = :uuid"),
+        @NamedQuery(name = "UserEntityByid", query = "select i from UserEntity i where i.id = :id")
 })
 public class ImageEntity implements Serializable {
 

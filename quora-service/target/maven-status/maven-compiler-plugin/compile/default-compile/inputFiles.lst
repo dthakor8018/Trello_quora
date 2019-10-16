@@ -9,6 +9,7 @@
 /Users/dthakor/Documents/Trello_quora/quora-service/src/main/java/com/upgrad/quora/service/exception/SignUpRestrictedException.java
 /Users/dthakor/Documents/Trello_quora/quora-service/src/main/java/com/upgrad/quora/service/business/SignupBusinessService.java
 /Users/dthakor/Documents/Trello_quora/quora-service/src/main/java/com/upgrad/quora/service/common/UnexpectedException.java
+/Users/dthakor/Documents/Trello_quora/quora-service/src/main/java/com/upgrad/quora/service/business/AuthenticationService.java
 /Users/dthakor/Documents/Trello_quora/quora-service/src/main/java/com/upgrad/quora/service/exception/SignOutRestrictedException.java
 /Users/dthakor/Documents/Trello_quora/quora-service/src/main/java/com/upgrad/quora/service/common/GenericErrorCode.java
 /Users/dthakor/Documents/Trello_quora/quora-service/src/main/java/com/upgrad/quora/service/exception/InvalidQuestionException.java

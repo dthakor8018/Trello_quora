@@ -3,6 +3,7 @@
 /Users/dthakor/Documents/Trello_quora/quora-api/target/generated-sources/./com/upgrad/quora/api/model/UserDetailsResponse.java
 /Users/dthakor/Documents/Trello_quora/quora-api/target/generated-sources/./com/upgrad/quora/api/model/SignupUserRequest.java
 /Users/dthakor/Documents/Trello_quora/quora-api/target/generated-sources/./io/swagger/api/ApiOriginFilter.java
+/Users/dthakor/Documents/Trello_quora/quora-api/src/main/java/com/upgrad/quora/api/controller/AuthenticationController.java
 /Users/dthakor/Documents/Trello_quora/quora-api/target/generated-sources/./io/swagger/api/ApiResponseMessage.java
 /Users/dthakor/Documents/Trello_quora/quora-api/target/generated-sources/./io/swagger/api/NotFoundException.java
 /Users/dthakor/Documents/Trello_quora/quora-api/target/generated-sources/./com/upgrad/quora/api/model/AnswerEditRequest.java

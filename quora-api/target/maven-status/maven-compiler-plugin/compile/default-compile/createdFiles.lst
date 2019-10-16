@@ -4,6 +4,7 @@ com/upgrad/quora/api/model/SignupUserResponse.class
 com/upgrad/quora/api/model/QuestionResponse.class
 com/upgrad/quora/api/model/AnswerResponse.class
 com/upgrad/quora/api/model/QuestionEditRequest.class
+com/upgrad/quora/api/controller/AuthenticationController.class
 io/swagger/api/ApiOriginFilter.class
 io/swagger/Swagger2SpringBoot$ExitException.class
 io/swagger/configuration/HomeController.class
