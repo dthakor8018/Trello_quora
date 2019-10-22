@@ -191,11 +191,11 @@ public class UserEntity implements Serializable {
         return new EqualsBuilder().append(this, obj).isEquals();
     }
 
-    @Override
+    /*@Override
     public int hashCode() {
-//        return new HashCodeBuilder().append(this).hashCode();
+        return new HashCodeBuilder().append(this).hashCode();
         return 1;
-    }
+    }*/
 
     @Override
     public String toString() {

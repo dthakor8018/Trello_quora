@@ -105,10 +105,10 @@ public class AnswerEntity implements Serializable {
         return new EqualsBuilder().append(this, obj).isEquals();
     }
 
-    @Override
+    /*@Override
     public int hashCode() {
         return new HashCodeBuilder().append(this).hashCode();
-    }
+    }*/
 
     @Override
     public String toString() {
