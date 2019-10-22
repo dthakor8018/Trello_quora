@@ -16,17 +16,8 @@ public class AnswerService {
     @Autowired
     private AnswerDao answerDao;
 
-    @Autowired
-    private UserDao userDao;
-
     @Transactional(propagation = Propagation.REQUIRED)
-    public AnswerEntity createAnswer(AnswerEntity answerEntity, final String authorizationToken) throws AuthorizationFailedException {
-        UserAuthTokenEntity userAuthTokenEntity = userDao.getUserAuthToken();
-        if (userAuthTokenEntity == null) {
-            throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload an image");
-        }
-
-        answerEntity.setUser(userAuthTokenEntity.getUser());
+    public AnswerEntity createAnswer(AnswerEntity answerEntity) throws AuthorizationFailedException {
         return answerDao.createAnswer(answerEntity);
     }
 }

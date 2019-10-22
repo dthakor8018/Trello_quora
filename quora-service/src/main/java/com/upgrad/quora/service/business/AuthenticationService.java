@@ -1,5 +1,6 @@
 package com.upgrad.quora.service.business;
 
+import com.upgrad.quora.service.dao.UserAuthDao;
 import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.entity.UserEntity;
@@ -16,6 +17,9 @@ public class AuthenticationService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private UserAuthDao userAuthDao;
 
     @Autowired
     private PasswordCryptographyProvider CryptographyProvider;
@@ -40,7 +44,7 @@ public class AuthenticationService {
             userAuthTokenEntity.setLoginAt(now);
             userAuthTokenEntity.setExpiresAt(expiresAt);
 
-            userDao.createAuthToken(userAuthTokenEntity);
+            userAuthDao.createAuthToken(userAuthTokenEntity);
 
             userDao.updateUser(userEntity);
             return userAuthTokenEntity;
