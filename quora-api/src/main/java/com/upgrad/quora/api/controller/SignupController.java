@@ -82,7 +82,7 @@ public class SignupController {
 
         String[] decodedUserNamePassword = decodedString.split(":");
 
-        UserAuthTokenEntity userAuthToken = authenticationService.authenticate(decodedUserNamePassword[0], decodedUserNamePassword[1]);
+        UserAuthTokenEntity userAuthToken = authenticationService.authenticateByUserNamePassword(decodedUserNamePassword[0], decodedUserNamePassword[1]);
 
         UserEntity user = userAuthToken.getUser();
 

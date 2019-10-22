@@ -3,9 +3,8 @@ package com.upgrad.quora.api.controller;
 import com.upgrad.quora.api.model.AnswerRequest;
 import com.upgrad.quora.api.model.AnswerResponse;
 import com.upgrad.quora.service.business.AnswerService;
-import com.upgrad.quora.service.business.AnswerService;
+import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.QuestionService;
-import com.upgrad.quora.service.dao.UserAuthDao;
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
@@ -28,7 +27,7 @@ public class AnswerController {
     private AnswerService answerService;
 
     @Autowired
-    private UserAuthDao userAuthDao;
+    private AuthenticationService authenticationService;
 
     @Autowired
     private QuestionService questionService;
@@ -37,7 +36,7 @@ public class AnswerController {
     public ResponseEntity<AnswerResponse> addAnswer(final AnswerRequest answerRequest, @RequestParam("questionId") final String questionUuid, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException {
 
         String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = userAuthDao.getUserAuthTokenByAccessToken(accessToken);
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
         if (userAuthTokenEntity == null) {
             throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload Question");
         }

@@ -5,6 +5,7 @@ import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,7 +26,7 @@ public class AuthenticationService {
     private PasswordCryptographyProvider CryptographyProvider;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserAuthTokenEntity authenticate(final String username, final String password) throws AuthenticationFailedException {
+    public UserAuthTokenEntity authenticateByUserNamePassword(final String username, final String password) throws AuthenticationFailedException {
         UserEntity userEntity = userDao.getUserByEmail(username);
         if (userEntity == null) {
             throw new AuthenticationFailedException("ATH-001", "User with email not found");
@@ -51,6 +52,17 @@ public class AuthenticationService {
         } else {
             throw new AuthenticationFailedException("ATH-002", "Password failed");
         }
+    }
+
+    public UserAuthTokenEntity authenticateByAccessToken(final String accessToken) throws AuthorizationFailedException {
+
+        UserAuthTokenEntity userAuthTokenEntity = userAuthDao.getUserAuthTokenEntityByAccessToken(accessToken);
+
+        if ( userAuthTokenEntity == null) {
+            throw new AuthorizationFailedException("ATH-003", "Not able to authenticate using Access token");
+        }
+
+        return userAuthTokenEntity;
     }
 
 }

@@ -2,8 +2,8 @@ package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.QuestionRequest;
 import com.upgrad.quora.api.model.QuestionResponse;
+import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.QuestionService;
-import com.upgrad.quora.service.dao.UserAuthDao;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
@@ -28,14 +28,14 @@ public class QuestionController {
     private QuestionService questionService;
 
     @Autowired
-    private UserAuthDao userAuthDao;
+    private AuthenticationService authenticationService;
 
 
     @RequestMapping(method = RequestMethod.POST, path = "/question/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<QuestionResponse> createQuestion(final QuestionRequest questionRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException {
 
         String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = userAuthDao.getUserAuthTokenByAccessToken(accessToken);
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
         if (userAuthTokenEntity == null) {
             throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload Question");
         }
