@@ -24,4 +24,9 @@ public class QuestionService {
     public QuestionEntity upload(QuestionEntity questionEntity) throws AuthorizationFailedException {
         return questionDao.createQuestion(questionEntity);
     }
+
+    public QuestionEntity getQuestionByUuid(final String uuid) throws AuthorizationFailedException {
+        return questionDao.getQuestionByUuid(uuid);
+    }
+
 }

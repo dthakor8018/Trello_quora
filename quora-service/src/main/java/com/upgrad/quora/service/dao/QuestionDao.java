@@ -24,13 +24,12 @@ public class QuestionDao {
         }
     }
 
-    public QuestionEntity getUserByEmail(final String email) {
+    public QuestionEntity getQuestionByUuid(final String uuid) {
         try {
-            return entityManager.createNamedQuery("userByEmail", QuestionEntity.class).setParameter("email", email).getSingleResult();
+            return entityManager.createNamedQuery("QuestionEntityByUuid", QuestionEntity.class).setParameter("uuid", uuid).getSingleResult();
         } catch (NoResultException nre) {
             return null;
         }
     }
-
 
 }
