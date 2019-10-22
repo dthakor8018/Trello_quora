@@ -86,11 +86,11 @@ public class PasswordCryptographyProvider {
         return new String(hexChars);
     }
 
-    private static String getBase64EncodedBytesAsString(byte bytes[]) {
+    public static String getBase64EncodedBytesAsString(byte bytes[]) {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-    private static byte[] getBase64DecodedStringAsBytes(String decode) {
+    public static byte[] getBase64DecodedStringAsBytes(String decode) {
         return Base64.getDecoder().decode(decode);
     }
 }

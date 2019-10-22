@@ -4,6 +4,7 @@ import com.upgrad.quora.api.model.SigninResponse;
 import com.upgrad.quora.api.model.SignupUserRequest;
 import com.upgrad.quora.api.model.SignupUserResponse;
 import com.upgrad.quora.service.business.AuthenticationService;
+import com.upgrad.quora.service.business.PasswordCryptographyProvider;
 import com.upgrad.quora.service.business.SignupBusinessService;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.entity.UserEntity;
@@ -31,6 +32,9 @@ public class SignupController {
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
+    private PasswordCryptographyProvider passwordCryptographyProvider;
 
     @RequestMapping(method = RequestMethod.POST, path = "/user/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupUserResponse> userSignup(final SignupUserRequest signupUserRequest) {
@@ -69,11 +73,16 @@ public class SignupController {
 
     @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SigninResponse> login(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
-        byte[] decode = Base64.getDecoder().decode(authorization);
-        String decodedText = new String(decode);
-        String[] decodedArray = decodedText.split(":");
 
-        UserAuthTokenEntity userAuthToken = authenticationService.authenticate(decodedArray[0], decodedArray[1]);
+        String[] base64EncodedString = authorization.split("basic ");
+
+        byte[] decodedArray = passwordCryptographyProvider.getBase64DecodedStringAsBytes(base64EncodedString[1]);
+
+        String decodedString = new String(decodedArray);
+
+        String[] decodedUserNamePassword = decodedString.split(":");
+
+        UserAuthTokenEntity userAuthToken = authenticationService.authenticate(decodedUserNamePassword[0], decodedUserNamePassword[1]);
 
         UserEntity user = userAuthToken.getUser();
 

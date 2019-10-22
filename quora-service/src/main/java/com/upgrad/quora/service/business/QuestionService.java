@@ -21,6 +21,8 @@ public class QuestionService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity upload(QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
+
+
         UserAuthTokenEntity userAuthTokenEntity = userDao.getUserAuthToken();
         if (userAuthTokenEntity == null) {
             throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload an image");
