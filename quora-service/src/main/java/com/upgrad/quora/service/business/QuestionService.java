@@ -23,9 +23,10 @@ public class QuestionService {
     public QuestionEntity upload(QuestionEntity questionEntity, final String authorizationToken) throws AuthorizationFailedException {
 
 
-        UserAuthTokenEntity userAuthTokenEntity = userDao.getUserAuthToken();
+        String accessToken = authorizationToken.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = userDao.userAuthTokenByAccessToken(accessToken);
         if (userAuthTokenEntity == null) {
-            throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload an image");
+            throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload Question");
         }
 
         questionEntity.setUser(userAuthTokenEntity.getUser());

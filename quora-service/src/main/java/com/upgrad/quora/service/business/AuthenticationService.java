@@ -48,4 +48,5 @@ public class AuthenticationService {
             throw new AuthenticationFailedException("ATH-002", "Password failed");
         }
     }
+
 }
