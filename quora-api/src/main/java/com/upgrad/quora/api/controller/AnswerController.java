@@ -26,7 +26,7 @@ public class AnswerController {
     private AnswerService answerService;
 
     @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerResponse> answerResponseResponseEntity(final AnswerRequest answerRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException {
+    public ResponseEntity<AnswerResponse> addAnswer(final AnswerRequest answerRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException {
         final AnswerEntity answerEntity = new AnswerEntity();
         answerEntity.setAns(answerRequest.getAnswer());
         answerEntity.setUuid(UUID.randomUUID().toString());
