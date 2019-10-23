@@ -9,6 +9,7 @@ import com.upgrad.quora.service.business.SignupBusinessService;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class SignupController {
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
     @RequestMapping(method = RequestMethod.POST, path = "/user/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignupUserResponse> userSignup(final SignupUserRequest signupUserRequest) {
+    public ResponseEntity<SignupUserResponse> userSignup(final SignupUserRequest signupUserRequest) throws SignUpRestrictedException {
 
         UserEntity userEntity = new UserEntity();
 
@@ -53,21 +54,13 @@ public class SignupController {
         userEntity.setPassword(signupUserRequest.getPassword());
         userEntity.setCountry(signupUserRequest.getCountry());
         userEntity.setContactNumber(signupUserRequest.getContactNumber());
-        userEntity.setSalt("1234abc");
         userEntity.setRole("nonadmin");
 
-        System.out.println("userEntity...." + userEntity);
+        //System.out.println("userEntity...." + userEntity);
 
-
-        SignupUserResponse userResponse = null;
-        try {
-            final UserEntity createdUserEntity = signupBusinessService.signup(userEntity);
-            userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
-            return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
-        } catch (Exception e) {
-            userResponse = new SignupUserResponse().status("user already exist");
-            return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CONFLICT);
-        }
+        final UserEntity createdUserEntity = signupBusinessService.signup(userEntity);
+        SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
+        return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
 
     }
 

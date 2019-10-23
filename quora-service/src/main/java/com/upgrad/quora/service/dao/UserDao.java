@@ -2,6 +2,8 @@ package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.entity.UserEntity;
+import com.upgrad.quora.service.exception.SignUpRestrictedException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -15,14 +17,9 @@ public class UserDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public UserEntity createUser(UserEntity userEntity) {
-        System.out.println("UserDao..." + userEntity);
+    public UserEntity createUser(UserEntity userEntity){
         entityManager.persist(userEntity);
-        try {
-            return userEntity;
-        } catch (Exception e) {
-            return null;
-        }
+        return userEntity;
     }
 
     public UserEntity getUserByEmail(final String email) {
@@ -33,9 +30,19 @@ public class UserDao {
         }
     }
 
+    public UserEntity getUserByUserName(final String userName) {
+        try {
+            return entityManager.createNamedQuery("userByUserName", UserEntity.class).setParameter("userName", userName).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
     public void updateUser(final UserEntity updatedUserEntity) {
         entityManager.merge(updatedUserEntity);
     }
+
+
 
 
 }
