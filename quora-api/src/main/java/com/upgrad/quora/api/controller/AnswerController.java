@@ -102,4 +102,22 @@ public class AnswerController {
 
     return new ResponseEntity<AnswerResponse>(answerDetailsResponse, HttpStatus.OK);
   }
+
+  @RequestMapping(
+      method = RequestMethod.DELETE,
+      path = "/answer/delete/{answerId}",
+      consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity deleteAnswer(
+      @PathVariable("answerId") final long answerId,
+      @RequestHeader("authorization") final String authorization)
+      throws AuthorizationFailedException, AnswerNotFoundException {
+    AnswerEntity answerEntity = new AnswerEntity();
+    answerEntity.setId(answerId);
+    answerService.deleteAnswer(answerEntity, authorization);
+    AnswerResponse answerDetailsResponse =
+        new AnswerResponse().id(answerEntity.getUuid()).status("ANSWER DELETED");
+
+    return ResponseEntity.status(HttpStatus.OK).body(answerDetailsResponse);
+  }
 }
