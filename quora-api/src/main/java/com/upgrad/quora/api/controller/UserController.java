@@ -103,7 +103,7 @@ public class UserController {
 
         userAuthTokenEntity.setLogoutAt(ZonedDateTime.now());
 
-        authenticationService.updaUserAuthToken(userAuthTokenEntity);
+        authenticationService.updateUserAuthToken(userAuthTokenEntity);
 
         SignoutResponse signoutResponse = new SignoutResponse().id(userAuthTokenEntity.getUser().getUuid()).message("SIGNED OUT SUCCESSFULLY");
         HttpHeaders headers = new HttpHeaders();

@@ -21,7 +21,7 @@ public class AdminController {
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
     @RequestMapping(method = RequestMethod.GET, path = "/admin/user/{userId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UserDeleteResponse> userDelete(@RequestParam("userId") final String userId, @RequestHeader("authorization") final String authorization) {
+    public ResponseEntity<UserDeleteResponse> userDelete(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) {
 
         UserDeleteResponse userDeleteResponse = new UserDeleteResponse();
         return new ResponseEntity<UserDeleteResponse>(userDeleteResponse, HttpStatus.OK);

@@ -63,7 +63,7 @@ public class AuthenticationService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserAuthTokenEntity updaUserAuthToken(final UserAuthTokenEntity userAuthTokenEntity) {
+    public UserAuthTokenEntity updateUserAuthToken(final UserAuthTokenEntity userAuthTokenEntity) {
         return userAuthDao.updaUserAuthToken(userAuthTokenEntity);
     }
 
