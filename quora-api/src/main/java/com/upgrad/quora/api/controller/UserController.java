@@ -24,12 +24,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/")
-public class SignupController {
+public class UserController {
 
     @Autowired
     private SignupBusinessService signupBusinessService;
@@ -92,7 +91,12 @@ public class SignupController {
     public ResponseEntity<SignoutResponse> signout(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, SignOutRestrictedException {
 
         String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+        UserAuthTokenEntity userAuthTokenEntity = null;
+        try {
+            userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+        } catch(Exception e){
+            throw new AuthorizationFailedException("SGR-001", "User is not Signed in");
+        }
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("SGR-001", "User is not Signed in");
         }
