@@ -41,7 +41,6 @@ public class AuthenticationService {
             final ZonedDateTime expiresAt = now.plusHours(8);
 
             userAuthTokenEntity.setAccessToken(jwtTokenProvider.generateToken(userEntity.getUuid(), now, expiresAt));
-
             userAuthTokenEntity.setLoginAt(now);
             userAuthTokenEntity.setExpiresAt(expiresAt);
 
@@ -54,15 +53,20 @@ public class AuthenticationService {
         }
     }
 
-    public UserAuthTokenEntity authenticateByAccessToken(final String accessToken) throws AuthorizationFailedException {
-
+    public UserAuthTokenEntity authenticateByAccessToken(final String accessToken) throws AuthorizationFailedException{
         UserAuthTokenEntity userAuthTokenEntity = userAuthDao.getUserAuthTokenEntityByAccessToken(accessToken);
-
-        if ( userAuthTokenEntity == null) {
-            throw new AuthorizationFailedException("ATH-003", "Not able to authenticate using Access token");
+        if( userAuthTokenEntity.getLogoutAt() == null ) {
+            return userAuthTokenEntity;
+        } else {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
-
-        return userAuthTokenEntity;
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserAuthTokenEntity updaUserAuthToken(final UserAuthTokenEntity userAuthTokenEntity) {
+        return userAuthDao.updaUserAuthToken(userAuthTokenEntity);
+    }
+
+
 
 }

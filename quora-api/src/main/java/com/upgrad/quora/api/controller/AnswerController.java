@@ -37,8 +37,9 @@ public class AnswerController {
 
         String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
-        if (userAuthTokenEntity == null) {
-            throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload Question");
+
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
+            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
         }
 
         final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
