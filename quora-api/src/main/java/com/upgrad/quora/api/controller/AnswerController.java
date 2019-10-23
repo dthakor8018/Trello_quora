@@ -1,5 +1,6 @@
 package com.upgrad.quora.api.controller;
 
+import com.upgrad.quora.api.model.AnswerDetailsResponse;
 import com.upgrad.quora.api.model.AnswerRequest;
 import com.upgrad.quora.api.model.AnswerResponse;
 import com.upgrad.quora.service.business.AnswerService;
@@ -9,6 +10,8 @@ import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
+import com.upgrad.quora.service.exception.InvalidQuestionException;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,35 +26,58 @@ import java.util.UUID;
 @RequestMapping("/")
 public class AnswerController {
 
-    @Autowired
-    private AnswerService answerService;
+  @Autowired private AnswerService answerService;
 
-    @Autowired
-    private AuthenticationService authenticationService;
+  @Autowired private AuthenticationService authenticationService;
 
-    @Autowired
-    private QuestionService questionService;
+  @Autowired private QuestionService questionService;
 
-    @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerResponse> addAnswer(final AnswerRequest answerRequest, @RequestParam("questionId") final String questionUuid, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException {
+  @RequestMapping(
+      method = RequestMethod.POST,
+      path = "/question/{questionId}/answer/create",
+      consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<AnswerResponse> addAnswer(
+      final AnswerRequest answerRequest,
+      @RequestParam("questionId") final String questionUuid,
+      @RequestHeader("authorization") final String authorization)
+      throws AuthorizationFailedException, UnsupportedEncodingException {
 
-        String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
-        if (userAuthTokenEntity == null) {
-            throw new AuthorizationFailedException("UP-001", "User is not Signed in, sign in to upload Question");
-        }
-
-        final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
-
-        final AnswerEntity answerEntity = new AnswerEntity();
-        answerEntity.setAns(answerRequest.getAnswer());
-        answerEntity.setUuid(UUID.randomUUID().toString());
-        answerEntity.setDate(ZonedDateTime.now());
-        answerEntity.setUser(userAuthTokenEntity.getUser());
-        answerEntity.setQuestion(questionEntity);
-
-        final AnswerEntity createAnswerEntity = answerService.createAnswer(answerEntity);
-        AnswerResponse questionResponse = new AnswerResponse().id(createAnswerEntity.getUuid()).status("Answer SUCCESSFULLY REGISTERED");
-        return new ResponseEntity<AnswerResponse>(questionResponse, HttpStatus.CREATED);
+    String accessToken = authorization.split("Bearer ")[1];
+    UserAuthTokenEntity userAuthTokenEntity =
+        authenticationService.authenticateByAccessToken(accessToken);
+    if (userAuthTokenEntity == null) {
+      throw new AuthorizationFailedException(
+          "UP-001", "User is not Signed in, sign in to upload Question");
     }
+
+    final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
+
+    final AnswerEntity answerEntity = new AnswerEntity();
+    answerEntity.setAns(answerRequest.getAnswer());
+    answerEntity.setUuid(UUID.randomUUID().toString());
+    answerEntity.setDate(ZonedDateTime.now());
+    answerEntity.setUser(userAuthTokenEntity.getUser());
+    answerEntity.setQuestion(questionEntity);
+
+    final AnswerEntity createAnswerEntity = answerService.createAnswer(answerEntity);
+    AnswerResponse questionResponse =
+        new AnswerResponse()
+            .id(createAnswerEntity.getUuid())
+            .status("Answer SUCCESSFULLY REGISTERED");
+    return new ResponseEntity<AnswerResponse>(questionResponse, HttpStatus.CREATED);
+  }
+
+  @RequestMapping(
+      method = RequestMethod.GET,
+      path = "answer/all/{questionId}",
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<List<AnswerEntity>> getAllAnswers(
+      @PathVariable("questionId") final String imageUuid,
+      @RequestHeader("authorization") final String authorization)
+      throws AuthorizationFailedException, InvalidQuestionException {
+
+    final List<AnswerEntity> answerEntity = answerService.getAllAnswer(imageUuid, authorization);
+    return ResponseEntity.status(HttpStatus.OK).body(answerEntity);
+  }
 }
