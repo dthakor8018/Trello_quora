@@ -27,9 +27,9 @@ public class AuthenticationService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthTokenEntity authenticateByUserNamePassword(final String username, final String password) throws AuthenticationFailedException {
-        UserEntity userEntity = userDao.getUserByEmail(username);
+        UserEntity userEntity = userDao.getUserByUserName(username);
         if (userEntity == null) {
-            throw new AuthenticationFailedException("ATH-001", "User with email not found");
+            throw new AuthenticationFailedException("ATH-001", "This username does not exist");
         }
 
         final String encryptedPassword = CryptographyProvider.encrypt(password, userEntity.getSalt());

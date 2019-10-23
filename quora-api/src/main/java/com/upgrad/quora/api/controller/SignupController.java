@@ -67,7 +67,7 @@ public class SignupController {
     @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SigninResponse> login(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
 
-        String[] base64EncodedString = authorization.split("basic ");
+        String[] base64EncodedString = authorization.split("Basic ");
 
         byte[] decodedArray = passwordCryptographyProvider.getBase64DecodedStringAsBytes(base64EncodedString[1]);
 
@@ -79,9 +79,9 @@ public class SignupController {
 
         UserEntity user = userAuthToken.getUser();
 
-        SigninResponse signinResponse = new SigninResponse().id(user.getUuid());
+        SigninResponse signinResponse = new SigninResponse().id(user.getUuid()).message("SIGNED IN SUCCESSFULLY");
         HttpHeaders headers = new HttpHeaders();
-        headers.add("access-token", userAuthToken.getAccessToken());
+        headers.add("access_token", userAuthToken.getAccessToken());
         return new ResponseEntity<SigninResponse>(signinResponse, headers, HttpStatus.OK);
     }
 }
