@@ -9,6 +9,7 @@ import com.upgrad.quora.service.business.QuestionService;
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
+import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
 import java.util.List;
@@ -79,5 +80,26 @@ public class AnswerController {
 
     final List<AnswerEntity> answerEntity = answerService.getAllAnswer(imageUuid, authorization);
     return ResponseEntity.status(HttpStatus.OK).body(answerEntity);
+  }
+
+  @RequestMapping(
+      method = RequestMethod.PUT,
+      path = "/answer/edit/{answerId}",
+      consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<AnswerResponse> editAnswerContent(
+      final String content,
+      @PathVariable("answerId") final long answerId,
+      @RequestHeader("authorization") final String authorization)
+      throws AuthorizationFailedException, AnswerNotFoundException {
+    AnswerEntity answerEntity = new AnswerEntity();
+
+    answerEntity.setAns(content);
+    answerEntity.setId(answerId);
+    AnswerEntity updatedAnswerEntity = answerService.updateAnswer(answerEntity, authorization);
+    AnswerResponse answerDetailsResponse =
+        new AnswerResponse().id(updatedAnswerEntity.getUuid()).status("ANSWER EDITED");
+
+    return new ResponseEntity<AnswerResponse>(answerDetailsResponse, HttpStatus.OK);
   }
 }

@@ -33,6 +33,14 @@ public class AnswerDao {
         }
     }
 
+    public AnswerEntity getAnswerById(final long id) {
+        try {
+            return entityManager.createNamedQuery("AnswerEntityById", AnswerEntity.class).setParameter("id", id).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
     public List<AnswerEntity> getAllAnswers(final String questionUUid) {
         try {
             return entityManager.createNamedQuery("AnswerEntityByUuid", AnswerEntity.class).setParameter("uuid", questionUUid).getResultList();
@@ -40,6 +48,8 @@ public class AnswerDao {
             return null;
         }
     }
-
+    public AnswerEntity updateAnswer(final AnswerEntity answerEntity) {
+        return entityManager.merge(answerEntity);
+    }
 
 }
