@@ -33,25 +33,14 @@ public class AnswerController {
 
   @Autowired private QuestionService questionService;
 
-  @RequestMapping(
-      method = RequestMethod.POST,
-      path = "/question/{questionId}/answer/create",
-      consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<AnswerResponse> addAnswer(
-      final AnswerRequest answerRequest,
-      @PathVariable("questionId") final String questionUuid,
-      @RequestHeader("authorization") final String authorization)
-      throws AuthorizationFailedException, UnsupportedEncodingException {
+  @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<AnswerResponse> addAnswer(final AnswerRequest answerRequest, @PathVariable("questionId") final String questionUuid, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException {
 
     String accessToken = authorization.split("Bearer ")[1];
-    UserAuthTokenEntity userAuthTokenEntity =
-        authenticationService.authenticateByAccessToken(accessToken);
+    UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
 
-    if (userAuthTokenEntity.getLogoutAt() != null
-        || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt())) {
-      throw new AuthorizationFailedException(
-          "ATHR-002", "User is signed out.Sign in first to post an answer");
+    if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
+      throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
     }
 
     final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
@@ -64,10 +53,7 @@ public class AnswerController {
     answerEntity.setQuestion(questionEntity);
 
     final AnswerEntity createAnswerEntity = answerService.createAnswer(answerEntity);
-    AnswerResponse questionResponse =
-        new AnswerResponse()
-            .id(createAnswerEntity.getUuid())
-            .status("Answer SUCCESSFULLY REGISTERED");
+    AnswerResponse questionResponse = new AnswerResponse().id(createAnswerEntity.getUuid()).status("Answer SUCCESSFULLY REGISTERED");
     return new ResponseEntity<AnswerResponse>(questionResponse, HttpStatus.CREATED);
   }
 
