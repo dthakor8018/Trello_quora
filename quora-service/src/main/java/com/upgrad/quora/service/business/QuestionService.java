@@ -31,6 +31,11 @@ public class QuestionService {
         return questionDao.updateQuestion(questionEntity);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteQuestion(QuestionEntity questionEntity) throws AuthorizationFailedException {
+        questionDao.deleteQuestion(questionEntity);
+    }
+
     public QuestionEntity getQuestionByUuid(final String uuid) throws AuthorizationFailedException {
         return questionDao.getQuestionByUuid(uuid);
     }

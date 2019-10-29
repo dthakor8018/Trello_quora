@@ -17,8 +17,8 @@ public class QuestionDao {
     private EntityManager entityManager;
 
     public QuestionEntity createQuestion(QuestionEntity questionEntity) {
-        entityManager.persist(questionEntity);
         try {
+            entityManager.persist(questionEntity);
             return questionEntity;
         } catch (Exception e) {
             return null;
@@ -26,12 +26,16 @@ public class QuestionDao {
     }
 
     public QuestionEntity updateQuestion(QuestionEntity questionEntity) {
-        entityManager.merge(questionEntity);
         try {
+            entityManager.merge(questionEntity);
             return questionEntity;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public void deleteQuestion(QuestionEntity questionEntity) {
+        entityManager.remove(questionEntity);
     }
 
     public QuestionEntity getQuestionByUuid(final String uuid) {
