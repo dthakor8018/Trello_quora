@@ -55,7 +55,7 @@ public class AuthenticationService {
 
     public UserAuthTokenEntity authenticateByAccessToken(final String accessToken) throws AuthorizationFailedException{
         UserAuthTokenEntity userAuthTokenEntity = userAuthDao.getUserAuthTokenEntityByAccessToken(accessToken);
-        if( userAuthTokenEntity.getLogoutAt() == null ) {
+        if( userAuthTokenEntity != null ) {
             return userAuthTokenEntity;
         } else {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,10 @@ public class QuestionService {
 
     public QuestionEntity getQuestionByUuid(final String uuid) throws AuthorizationFailedException {
         return questionDao.getQuestionByUuid(uuid);
+    }
+
+    public List<QuestionEntity> getAllQuestionsByUser(final UserEntity user) throws AuthorizationFailedException {
+        return questionDao.getAllQuestionsByUser(user);
     }
 
 }
