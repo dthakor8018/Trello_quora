@@ -4,11 +4,14 @@ import com.upgrad.quora.api.model.QuestionDetailsResponse;
 import com.upgrad.quora.api.model.QuestionRequest;
 import com.upgrad.quora.api.model.QuestionResponse;
 import com.upgrad.quora.service.business.AuthenticationService;
+import com.upgrad.quora.service.business.CommonService;
 import com.upgrad.quora.service.business.QuestionService;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthTokenEntity;
+import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +33,9 @@ public class QuestionController {
 
     @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
+    private CommonService commonService;
 
 
     @RequestMapping(
@@ -163,5 +169,40 @@ public class QuestionController {
         QuestionResponse questionResponse = new QuestionResponse().id(questionEntity.getUuid()).status("QUESTION DELETED");
 
         return new ResponseEntity<>(questionResponse, HttpStatus.OK);
+    }
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "question/all/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(
+            @PathVariable("userId") final String userUuid,
+            @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, UserNotFoundException, UnsupportedEncodingException {
+
+        String accessToken = authorization.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
+            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
+        }
+
+        UserEntity userEntity = commonService.getUserByUuid(userUuid);
+
+        if ( userEntity == null ) {
+            throw new UserNotFoundException("USR-001","User with entered uuid whose question details are to be seen does not exist");
+        }
+
+        final List<QuestionEntity> questionEntityList = questionService.getAllQuestionsByUser(userEntity);
+
+        List<QuestionDetailsResponse> questionDetailsResponseList = new ArrayList<>();
+
+        for(QuestionEntity questionEntity: questionEntityList) {
+
+            QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse().id(questionEntity.getUuid()).content(questionEntity.getContent());
+            questionDetailsResponseList.add(questionDetailsResponse);
+
+        }
+        return new ResponseEntity<>(questionDetailsResponseList, HttpStatus.OK);
     }
 }
