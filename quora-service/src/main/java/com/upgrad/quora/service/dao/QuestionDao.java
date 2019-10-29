@@ -17,8 +17,16 @@ public class QuestionDao {
     private EntityManager entityManager;
 
     public QuestionEntity createQuestion(QuestionEntity questionEntity) {
-        System.out.println("UserDao..." + questionEntity);
         entityManager.persist(questionEntity);
+        try {
+            return questionEntity;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public QuestionEntity updateQuestion(QuestionEntity questionEntity) {
+        entityManager.merge(questionEntity);
         try {
             return questionEntity;
         } catch (Exception e) {
