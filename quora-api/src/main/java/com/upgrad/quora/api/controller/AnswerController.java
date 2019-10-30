@@ -39,7 +39,7 @@ public class AnswerController {
     //String accessToken = authorization.split("Bearer ")[1];
     UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-    if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
+    if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
       throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
     }
 

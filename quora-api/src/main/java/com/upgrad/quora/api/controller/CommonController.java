@@ -33,21 +33,25 @@ public class CommonController {
     @Autowired
     private CommonService commonService;
 
-    @RequestMapping(method = RequestMethod.POST, path = "/userprofile/{userId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(
+        method = RequestMethod.GET,
+        path = "/userprofile/{userId}",
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDetailsResponse> getUserDetail(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UserNotFoundException{
-
-        //String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
-
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
-            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get user details");
-        }
 
         UserEntity userEntity = commonService.getUserByUuid(userId);
 
         if( userEntity == null ) {
             throw new UserNotFoundException("USR-001","User with entered uuid does not exist");
         }
+
+        //String accessToken = authorization.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
+
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt())) {
+            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get user details");
+        }
+
 
         UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
         userDetailsResponse.setUserName(userEntity.getUserName());

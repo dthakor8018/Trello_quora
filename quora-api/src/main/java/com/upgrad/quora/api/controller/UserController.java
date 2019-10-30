@@ -97,7 +97,7 @@ public class UserController {
         } catch(Exception e){
             throw new AuthorizationFailedException("SGR-001", "User is not Signed in");
         }
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("SGR-001", "User is not Signed in");
         }
 
