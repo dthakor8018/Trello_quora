@@ -44,7 +44,7 @@ public class UserController {
 
         UserEntity userEntity = new UserEntity();
 
-        System.out.println("signupUserRequest...." + signupUserRequest.toString());
+        //System.out.println("signupUserRequest...." + signupUserRequest.toString());
 
         userEntity.setUuid(UUID.randomUUID().toString());
         userEntity.setFirstName(signupUserRequest.getFirstName());
@@ -90,10 +90,10 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignoutResponse> signout(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, SignOutRestrictedException {
 
-        String accessToken = authorization.split("Bearer ")[1];
+        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = null;
         try {
-            userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+            userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
         } catch(Exception e){
             throw new AuthorizationFailedException("SGR-001", "User is not Signed in");
         }

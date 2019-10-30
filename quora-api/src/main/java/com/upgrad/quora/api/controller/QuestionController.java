@@ -48,8 +48,8 @@ public class QuestionController {
         @RequestHeader("authorization") final String authorization)
         throws AuthorizationFailedException, UnsupportedEncodingException {
 
-        String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+        //String accessToken = authorization.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post a question");
@@ -73,8 +73,8 @@ public class QuestionController {
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization)
         throws AuthorizationFailedException, UnsupportedEncodingException {
 
-        String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+        //String accessToken = authorization.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
@@ -106,8 +106,8 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException, UnsupportedEncodingException {
 
-        String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+        //String accessToken = authorization.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit the question");
@@ -146,8 +146,8 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException, UnsupportedEncodingException {
 
-        String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+        //String accessToken = authorization.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to delete a question");
@@ -180,8 +180,8 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, UserNotFoundException, UnsupportedEncodingException {
 
-        String accessToken = authorization.split("Bearer ")[1];
-        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(accessToken);
+        //String accessToken = authorization.split("Bearer ")[1];
+        UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
