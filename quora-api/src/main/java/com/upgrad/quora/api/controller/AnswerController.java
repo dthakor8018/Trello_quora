@@ -34,7 +34,13 @@ public class AnswerController {
   @Autowired private QuestionService questionService;
 
   @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<AnswerResponse> addAnswer(final AnswerRequest answerRequest, @PathVariable("questionId") final String questionUuid, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException {
+  public ResponseEntity<AnswerResponse> addAnswer(final AnswerRequest answerRequest, @PathVariable("questionId") final String questionUuid, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException, InvalidQuestionException {
+
+    final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
+
+    if ( questionEntity == null ) {
+      throw new InvalidQuestionException("QUES-001","The question entered is invalid");
+    }
 
     //String accessToken = authorization.split("Bearer ")[1];
     UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
@@ -42,8 +48,6 @@ public class AnswerController {
     if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
       throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
     }
-
-    final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
 
     final AnswerEntity answerEntity = new AnswerEntity();
     answerEntity.setAns(answerRequest.getAnswer());
