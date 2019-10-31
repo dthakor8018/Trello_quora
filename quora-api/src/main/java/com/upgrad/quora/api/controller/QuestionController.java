@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -37,18 +38,16 @@ public class QuestionController {
     @Autowired
     private CommonService commonService;
 
-
     @RequestMapping(
-        method = RequestMethod.POST,
-        path = "/question/create",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+            method = RequestMethod.POST,
+            path = "/question/create",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<QuestionResponse> createQuestion(
-        final QuestionRequest questionRequest,
-        @RequestHeader("authorization") final String authorization)
-        throws AuthorizationFailedException, UnsupportedEncodingException {
+            final QuestionRequest questionRequest,
+            @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, UnsupportedEncodingException {
 
-        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
@@ -67,27 +66,24 @@ public class QuestionController {
     }
 
     @RequestMapping(
-        method = RequestMethod.GET,
-        path = "/question/all",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization)
-        throws AuthorizationFailedException, UnsupportedEncodingException {
+            method = RequestMethod.GET,
+            path = "/question/all",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(
+            @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, UnsupportedEncodingException {
 
-        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
         }
 
-
-
         final List<QuestionEntity> questionEntityList = questionService.getAllQuestionsByUser(userAuthTokenEntity.getUser());
 
         List<QuestionDetailsResponse> questionDetailsResponseList = new ArrayList<>();
 
         for(QuestionEntity questionEntity: questionEntityList) {
-
             QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse().id(questionEntity.getUuid()).content(questionEntity.getContent());
             questionDetailsResponseList.add(questionDetailsResponse);
 
@@ -106,7 +102,6 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException, UnsupportedEncodingException {
 
-        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
@@ -146,7 +141,6 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException, UnsupportedEncodingException {
 
-        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
@@ -180,7 +174,6 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, UserNotFoundException, UnsupportedEncodingException {
 
-        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {

@@ -33,23 +33,32 @@ public class CommonController {
     @Autowired
     private CommonService commonService;
 
+    //CommonController error code and  messages
+    static String[] errorCodeList = {"ATHR-001", "ATHR-002", "USR-001"};
+    static String[] errorCodeMessage = {
+            "User has not signed in",                               // 0 - ATHR-001
+            "User is signed out.Sign in first to get user details", // 1 - ATHR-002
+            "User with entered uuid does not exist"                 // 2 - USR-001
+        };
     @RequestMapping(
-        method = RequestMethod.GET,
-        path = "/userprofile/{userId}",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UserDetailsResponse> getUserDetail(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UserNotFoundException{
+            method = RequestMethod.GET,
+            path = "/userprofile/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UserDetailsResponse> getUserDetail(
+            @PathVariable("userId") final String userId,
+            @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, UserNotFoundException{
 
         UserEntity userEntity = commonService.getUserByUuid(userId);
 
         if( userEntity == null ) {
-            throw new UserNotFoundException("USR-001","User with entered uuid does not exist");
+            throw new UserNotFoundException(errorCodeList[2],errorCodeMessage[2]);
         }
 
-        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt())) {
-            throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get user details");
+            throw new AuthorizationFailedException(errorCodeList[1],errorCodeMessage[1]);
         }
 
 

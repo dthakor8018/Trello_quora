@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/")
@@ -34,24 +36,38 @@ public class AdminController {
     @Autowired
     private AdminBusinessService adminBusinessService;
 
-    @RequestMapping(method = RequestMethod.DELETE, path = "/admin/user/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UserDeleteResponse> userDelete(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UserNotFoundException{
+    //AdminController error code and  messages
+    static String[] errorCodeList = {"ATHR-001", "ATHR-002", "ATHR-003", "USR-001"};
+    static String[] errorCodeMessage = {
+            "User has not signed in",                             // 0 - ATHR-001
+            "User is signed out",                                 // 1 - ATHR-002
+            "Unauthorized Access, Entered user is not an admin",  // 2 - ATHR-003
+            "User with entered uuid to be deleted does not exist" // 3 - USR-001
+        };
 
-        //String accessToken = authorization.split("Bearer ")[1];
+    @RequestMapping(
+            method = RequestMethod.DELETE,
+            path = "/admin/user/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UserDeleteResponse> userDelete(
+            @PathVariable("userId") final String userId,
+            @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, UserNotFoundException{
+
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
-            throw new AuthorizationFailedException("ATHR-002","User is signed out");
+            throw new AuthorizationFailedException(errorCodeList[1],errorCodeMessage[1]);
         }
 
         if ( userAuthTokenEntity.getUser().getRole().compareTo("admin") != 0 ) {
-            throw new AuthorizationFailedException("ATHR-003","Unauthorized Access, Entered user is not an admin");
+            throw new AuthorizationFailedException(errorCodeList[2],errorCodeMessage[2]);
         }
 
         UserEntity userEntity = commonService.getUserByUuid(userId);
 
         if( userEntity == null ) {
-            throw new UserNotFoundException("USR-001","User with entered uuid to be deleted does not exist");
+            throw new UserNotFoundException(errorCodeList[3],errorCodeMessage[3]);
         }
 
         adminBusinessService.userDelete(userEntity);

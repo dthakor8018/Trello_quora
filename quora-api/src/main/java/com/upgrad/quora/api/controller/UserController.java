@@ -39,12 +39,27 @@ public class UserController {
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
-    @RequestMapping(method = RequestMethod.POST, path = "/user/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignupUserResponse> userSignup(final SignupUserRequest signupUserRequest) throws SignUpRestrictedException {
+    //AdminController error code and  messages
+    static String[] errorCodeList = {"SGR-001", "SGR-002", "ATH-001", "ATH-002", "SGR-001"};
+
+    static String[] errorCodeMessage = {
+            "Try any other Username, this Username has already been taken",		 // 0 - SGR-001
+            "This user has already been registered, try with any other emailId", // 1 - SGR-002
+            "This username does not exist",										 // 2 - ATH-001
+            "Password failed",													 // 3 - ATH-002
+            "User is not Signed in"												 // 4 - SGR-001
+        };
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            path = "/user/signup",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<SignupUserResponse> userSignup(
+            final SignupUserRequest signupUserRequest)
+            throws SignUpRestrictedException {
 
         UserEntity userEntity = new UserEntity();
-
-        //System.out.println("signupUserRequest...." + signupUserRequest.toString());
 
         userEntity.setUuid(UUID.randomUUID().toString());
         userEntity.setFirstName(signupUserRequest.getFirstName());
@@ -58,16 +73,19 @@ public class UserController {
         userEntity.setContactNumber(signupUserRequest.getContactNumber());
         userEntity.setRole("nonadmin");
 
-        //System.out.println("userEntity...." + userEntity);
-
         final UserEntity createdUserEntity = signupBusinessService.signup(userEntity);
         SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
         return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
 
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SigninResponse> login(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
+    @RequestMapping(
+            method = RequestMethod.POST,
+            path = "/user/signin",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<SigninResponse> signin(
+            @RequestHeader("authorization") final String authorization)
+            throws AuthenticationFailedException {
 
         String[] base64EncodedString = authorization.split("Basic ");
 
@@ -87,18 +105,23 @@ public class UserController {
         return new ResponseEntity<SigninResponse>(signinResponse, headers, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignoutResponse> signout(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, SignOutRestrictedException {
+    @RequestMapping(
+            method = RequestMethod.POST,
+            path = "/user/signout",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<SignoutResponse> signout(
+            @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, SignOutRestrictedException {
 
         //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = null;
         try {
             userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
         } catch(Exception e){
-            throw new AuthorizationFailedException("SGR-001", "User is not Signed in");
+            throw new AuthorizationFailedException(errorCodeList[4],errorCodeMessage[4]);
         }
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
-            throw new AuthorizationFailedException("SGR-001", "User is not Signed in");
+            throw new AuthorizationFailedException(errorCodeList[4],errorCodeMessage[4]);
         }
 
         userAuthTokenEntity.setLogoutAt(ZonedDateTime.now());

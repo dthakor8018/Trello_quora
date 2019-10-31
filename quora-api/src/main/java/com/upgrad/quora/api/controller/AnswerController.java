@@ -33,83 +33,92 @@ public class AnswerController {
 
   @Autowired private QuestionService questionService;
 
-  @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<AnswerResponse> addAnswer(final AnswerRequest answerRequest, @PathVariable("questionId") final String questionUuid, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UnsupportedEncodingException, InvalidQuestionException {
+  @RequestMapping(
+          method = RequestMethod.POST,
+          path = "/question/{questionId}/answer/create",
+          consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+          produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<AnswerResponse> addAnswer(
+          final AnswerRequest answerRequest,
+          @PathVariable("questionId") final String questionUuid,
+          @RequestHeader("authorization") final String authorization)
+          throws AuthorizationFailedException, UnsupportedEncodingException, InvalidQuestionException {
 
-    final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
+      final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
 
-    if ( questionEntity == null ) {
-      throw new InvalidQuestionException("QUES-001","The question entered is invalid");
-    }
+      if ( questionEntity == null ) {
+        throw new InvalidQuestionException("QUES-001","The question entered is invalid");
+      }
 
-    //String accessToken = authorization.split("Bearer ")[1];
-    UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
+      UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-    if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
-      throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
-    }
+      if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
+      }
 
-    final AnswerEntity answerEntity = new AnswerEntity();
-    answerEntity.setAns(answerRequest.getAnswer());
-    answerEntity.setUuid(UUID.randomUUID().toString());
-    answerEntity.setDate(ZonedDateTime.now());
-    answerEntity.setUser(userAuthTokenEntity.getUser());
-    answerEntity.setQuestion(questionEntity);
+      final AnswerEntity answerEntity = new AnswerEntity();
+      answerEntity.setAns(answerRequest.getAnswer());
+      answerEntity.setUuid(UUID.randomUUID().toString());
+      answerEntity.setDate(ZonedDateTime.now());
+      answerEntity.setUser(userAuthTokenEntity.getUser());
+      answerEntity.setQuestion(questionEntity);
 
-    final AnswerEntity createAnswerEntity = answerService.createAnswer(answerEntity);
-    AnswerResponse questionResponse = new AnswerResponse().id(createAnswerEntity.getUuid()).status("Answer SUCCESSFULLY REGISTERED");
-    return new ResponseEntity<AnswerResponse>(questionResponse, HttpStatus.CREATED);
+      final AnswerEntity createAnswerEntity = answerService.createAnswer(answerEntity);
+      AnswerResponse questionResponse = new AnswerResponse().id(createAnswerEntity.getUuid()).status("Answer SUCCESSFULLY REGISTERED");
+      return new ResponseEntity<AnswerResponse>(questionResponse, HttpStatus.CREATED);
   }
 
   @RequestMapping(
-      method = RequestMethod.GET,
-      path = "answer/all/{questionId}",
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+          method = RequestMethod.GET,
+          path = "answer/all/{questionId}",
+          produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<List<AnswerEntity>> getAllAnswers(
-      @PathVariable("questionId") final String imageUuid,
-      @RequestHeader("authorization") final String authorization)
-      throws AuthorizationFailedException, InvalidQuestionException {
+          @PathVariable("questionId") final String imageUuid,
+          @RequestHeader("authorization") final String authorization)
+          throws AuthorizationFailedException, InvalidQuestionException {
 
-    final List<AnswerEntity> answerEntity = answerService.getAllAnswer(imageUuid, authorization);
-    return ResponseEntity.status(HttpStatus.OK).body(answerEntity);
+      final List<AnswerEntity> answerEntity = answerService.getAllAnswer(imageUuid, authorization);
+      return ResponseEntity.status(HttpStatus.OK).body(answerEntity);
   }
 
   @RequestMapping(
-      method = RequestMethod.PUT,
-      path = "/answer/edit/{answerId}",
-      consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+          method = RequestMethod.PUT,
+          path = "/answer/edit/{answerId}",
+          consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+          produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<AnswerResponse> editAnswerContent(
-      final String content,
-      @PathVariable("answerId") final long answerId,
-      @RequestHeader("authorization") final String authorization)
-      throws AuthorizationFailedException, AnswerNotFoundException {
-    AnswerEntity answerEntity = new AnswerEntity();
+          final String content,
+          @PathVariable("answerId") final long answerId,
+          @RequestHeader("authorization") final String authorization)
+          throws AuthorizationFailedException, AnswerNotFoundException {
 
-    answerEntity.setAns(content);
-    answerEntity.setId(answerId);
-    AnswerEntity updatedAnswerEntity = answerService.updateAnswer(answerEntity, authorization);
-    AnswerResponse answerDetailsResponse =
-        new AnswerResponse().id(updatedAnswerEntity.getUuid()).status("ANSWER EDITED");
+      AnswerEntity answerEntity = new AnswerEntity();
 
-    return new ResponseEntity<AnswerResponse>(answerDetailsResponse, HttpStatus.OK);
+      answerEntity.setAns(content);
+      answerEntity.setId(answerId);
+      AnswerEntity updatedAnswerEntity = answerService.updateAnswer(answerEntity, authorization);
+      AnswerResponse answerDetailsResponse =
+          new AnswerResponse().id(updatedAnswerEntity.getUuid()).status("ANSWER EDITED");
+
+      return new ResponseEntity<AnswerResponse>(answerDetailsResponse, HttpStatus.OK);
   }
 
   @RequestMapping(
-      method = RequestMethod.DELETE,
-      path = "/answer/delete/{answerId}",
-      consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+          method = RequestMethod.DELETE,
+          path = "/answer/delete/{answerId}",
+          consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+          produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity deleteAnswer(
-      @PathVariable("answerId") final long answerId,
-      @RequestHeader("authorization") final String authorization)
-      throws AuthorizationFailedException, AnswerNotFoundException {
-    AnswerEntity answerEntity = new AnswerEntity();
-    answerEntity.setId(answerId);
-    answerService.deleteAnswer(answerEntity, authorization);
-    AnswerResponse answerDetailsResponse =
+          @PathVariable("answerId") final long answerId,
+          @RequestHeader("authorization") final String authorization)
+          throws AuthorizationFailedException, AnswerNotFoundException {
+
+      AnswerEntity answerEntity = new AnswerEntity();
+      answerEntity.setId(answerId);
+      answerService.deleteAnswer(answerEntity, authorization);
+      AnswerResponse answerDetailsResponse =
         new AnswerResponse().id(answerEntity.getUuid()).status("ANSWER DELETED");
 
-    return ResponseEntity.status(HttpStatus.OK).body(answerDetailsResponse);
+      return ResponseEntity.status(HttpStatus.OK).body(answerDetailsResponse);
   }
 }
