@@ -51,7 +51,7 @@ public class QuestionController {
         //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post a question");
         }
 
@@ -76,13 +76,13 @@ public class QuestionController {
         //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
         }
 
 
 
-        final List<QuestionEntity> questionEntityList = questionService.getAllQuestionsByUser(userAuthTokenEntity.getUser());
+        final List<QuestionEntity> questionEntityList = questionService.getAllQuestions();
 
         List<QuestionDetailsResponse> questionDetailsResponseList = new ArrayList<>();
 
@@ -109,7 +109,7 @@ public class QuestionController {
         //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit the question");
         }
 
@@ -149,7 +149,7 @@ public class QuestionController {
         //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to delete a question");
         }
 
@@ -183,7 +183,7 @@ public class QuestionController {
         //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isAfter(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
         }
 
