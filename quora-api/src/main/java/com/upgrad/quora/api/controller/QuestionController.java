@@ -37,6 +37,14 @@ public class QuestionController {
     @Autowired
     private CommonService commonService;
 
+    /*
+     * This endpoint is used to create a new question in the Quora Application.
+     * input - questionRequest contain question content and
+     *  authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - QuestionResponse containing created question uuid
+     *           Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.POST,
             path = "/question/create",
@@ -47,23 +55,42 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, UnsupportedEncodingException {
 
+        // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post a question");
         }
 
+        //Create a new question Entity
         final QuestionEntity questionEntity = new QuestionEntity();
+
+        //set Content of new question Entity from request
         questionEntity.setContent(questionRequest.getContent());
+
+        //generate a uuid for new question Entity
         questionEntity.setUuid(UUID.randomUUID().toString());
+
+        //set time and user for new question Entity
         questionEntity.setDate(ZonedDateTime.now());
         questionEntity.setUser(userAuthTokenEntity.getUser());
 
+        //call questionService to create a new question
         final QuestionEntity createQuestionEntity = questionService.upload(questionEntity);
+
+        //create response containing newly created question uuid
         QuestionResponse questionResponse = new QuestionResponse().id(createQuestionEntity.getUuid()).status("Question SUCCESSFULLY REGISTERED");
         return new ResponseEntity<>(questionResponse, HttpStatus.CREATED);
     }
 
+    /*
+     * This endpoint is used get all question.
+     * input - authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - QuestionDetailsResponse for all the questions
+     *           Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.GET,
             path = "/question/all",
@@ -72,16 +99,20 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, UnsupportedEncodingException {
 
+        // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
         }
 
+        //call questionService to get list of all the question for a user
         final List<QuestionEntity> questionEntityList = questionService.getAllQuestionsByUser(userAuthTokenEntity.getUser());
 
         List<QuestionDetailsResponse> questionDetailsResponseList = new ArrayList<>();
 
+        //prepare response  with list of questions
         for(QuestionEntity questionEntity: questionEntityList) {
             QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse().id(questionEntity.getUuid()).content(questionEntity.getContent());
             questionDetailsResponseList.add(questionDetailsResponse);
@@ -90,6 +121,13 @@ public class QuestionController {
         return new ResponseEntity<>(questionDetailsResponseList, HttpStatus.OK);
     }
 
+    /*
+     * This endpoint is used edit a question.
+     * input - question uuid and authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - QuestionResponse containing edited question uuid
+     *           Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.PUT,
             path = "/question/edit/{questionId}",
@@ -101,20 +139,23 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException, UnsupportedEncodingException {
 
+        // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit the question");
         }
 
+        //call questionService to get a question by it uuid
         final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
 
+        //questionService with given uuid doesn't exist
         if(questionEntity == null ) {
             throw new InvalidQuestionException("QUES-001","Entered question uuid does not exist");
         }
 
         if(  questionEntity.getUser() != userAuthTokenEntity.getUser() ) {
-            //TODO: Chnage ATHR-003 can content in predefined strings
             throw new AuthorizationFailedException("ATHR-003","Only the question owner can edit the question");
         }
 
@@ -131,6 +172,13 @@ public class QuestionController {
         return new ResponseEntity<>(questionResponse, HttpStatus.OK);
     }
 
+    /*
+     * This endpoint is used delete a question.
+     * input - question uuid and authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - QuestionResponse containing deleted question uuid
+     *           Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.DELETE,
             path = "/question/delete/{questionId}",
@@ -140,20 +188,22 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException, UnsupportedEncodingException {
 
+        // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to delete a question");
         }
 
         final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
 
+        //questionService with given uuid doesn't exist
         if(questionEntity == null ) {
             throw new InvalidQuestionException("QUES-001","Entered question uuid does not exist");
         }
 
         if( questionEntity.getUser() != userAuthTokenEntity.getUser() && questionEntity.getUser().getRole().equals("nonadmin") ) {
-            //TODO: Chnage ATHR-003 can content in predefined strings
             throw new AuthorizationFailedException("ATHR-003","Only the question owner or admin can delete the question");
         }
 
@@ -164,6 +214,13 @@ public class QuestionController {
         return new ResponseEntity<>(questionResponse, HttpStatus.OK);
     }
 
+    /*
+     * This endpoint is used to get all the question of a user
+     * input - user uuid and authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - QuestionDetailsResponse containing all questions for given user
+     *           Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.GET,
             path = "question/all/{userId}",
@@ -173,14 +230,17 @@ public class QuestionController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, UserNotFoundException, UnsupportedEncodingException {
 
+        // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
         }
 
         UserEntity userEntity = commonService.getUserByUuid(userUuid);
 
+        //user with given uuid doesn't exist
         if ( userEntity == null ) {
             throw new UserNotFoundException("USR-001","User with entered uuid whose question details are to be seen does not exist");
         }
