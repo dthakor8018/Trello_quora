@@ -44,8 +44,4 @@ public class QuestionService {
         return questionDao.getAllQuestionsByUser(user);
     }
 
-    public List<QuestionEntity> getAllQuestions() throws AuthorizationFailedException {
-        return questionDao.getAllQuestions();
-    }
-
 }

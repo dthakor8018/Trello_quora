@@ -54,12 +54,4 @@ public class QuestionDao {
             return null;
         }
     }
-
-    public List<QuestionEntity> getAllQuestions(){
-        try {
-            return entityManager.createNamedQuery("QuestionsByAll", QuestionEntity.class).getResultList();
-        } catch (NoResultException nre) {
-            return null;
-        }
-    }
 }
