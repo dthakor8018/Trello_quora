@@ -32,28 +32,40 @@ public class CommonController {
             "User is signed out.Sign in first to get user details", // 1 - ATHR-002
             "User with entered uuid does not exist"                 // 2 - USR-001
         };
+
+    /*
+     * This endpoint is used to get detail of a user in the Quora Application.
+     * input - userUuid and authorization string containing auth token of current user
+     *
+     * output - Success - UserDetailsResponse containing details of user for given uuid
+     *          Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.GET,
             path = "/userprofile/{userId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDetailsResponse> getUserDetail(
-            @PathVariable("userId") final String userId,
+            @PathVariable("userId") final String userUuid,
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, UserNotFoundException{
 
-        UserEntity userEntity = commonService.getUserByUuid(userId);
+        //Call commonService to get user Entity for given userUuid
+        UserEntity userEntity = commonService.getUserByUuid(userUuid);
 
+        //user dosen't exist for given uuid
         if( userEntity == null ) {
             throw new UserNotFoundException(errorCodeList[2],errorCodeMessage[2]);
         }
 
+        // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt())) {
             throw new AuthorizationFailedException(errorCodeList[1],errorCodeMessage[1]);
         }
 
-
+        //create UserDetailsResponse from the data of user Entity
         UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
         userDetailsResponse.setUserName(userEntity.getUserName());
         userDetailsResponse.setAboutMe(userEntity.getAboutMe());
