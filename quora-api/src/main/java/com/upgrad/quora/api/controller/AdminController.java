@@ -42,6 +42,13 @@ public class AdminController {
             "User with entered uuid to be deleted does not exist" // 3 - USR-001
         };
 
+    /*
+     * This endpoint is used to delete a user in the Quora Application.
+     * input - userId and authorization string containing auth token of admin user only
+     *
+     * output - Success - UserDeleteResponse containing deleted user uuid
+     *          Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.DELETE,
             path = "/admin/user/{userId}",
@@ -51,24 +58,31 @@ public class AdminController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, UserNotFoundException{
 
+        // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException(errorCodeList[1],errorCodeMessage[1]);
         }
 
+        // Token belong to a non user
         if ( userAuthTokenEntity.getUser().getRole().compareTo("admin") != 0 ) {
             throw new AuthorizationFailedException(errorCodeList[2],errorCodeMessage[2]);
         }
 
+        //get userEntity which need to be deleted
         UserEntity userEntity = commonService.getUserByUuid(userId);
 
+        //requested userEntity which need to be deleted, doesn't exist
         if( userEntity == null ) {
             throw new UserNotFoundException(errorCodeList[3],errorCodeMessage[3]);
         }
 
+        //Call adminBusinessService to delete user Entity
         adminBusinessService.userDelete(userEntity);
 
+        //create userDeleteResponse with deleted user uuid
         UserDeleteResponse userDeleteResponse = new UserDeleteResponse();
         userDeleteResponse.setId(userEntity.getUuid());
         userDeleteResponse.setStatus("USER SUCCESSFULLY DELETED");
