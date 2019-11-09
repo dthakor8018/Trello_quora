@@ -50,6 +50,13 @@ public class UserController {
             "User is not Signed in"												 // 4 - SGR-001
         };
 
+    /*
+    * This endpoint is used to register a new user in the Quora Application.
+    * input - signupUserRequest contain all user details like
+    *  First Name, Last, User Name, Email id, about me, password, country, contact No.
+    *  output - Success - SignupUserResponse containing created user detail with its uuid
+    *           Failure - Failure Code  with message.
+    */
     @RequestMapping(
             method = RequestMethod.POST,
             path = "/user/signup",
@@ -59,9 +66,13 @@ public class UserController {
             final SignupUserRequest signupUserRequest)
             throws SignUpRestrictedException {
 
+        //create a new UserEntity Object
         UserEntity userEntity = new UserEntity();
 
+        //create a new random unique uuid and set it to new User Entity
         userEntity.setUuid(UUID.randomUUID().toString());
+
+        //Set All the field of new object from the Request
         userEntity.setFirstName(signupUserRequest.getFirstName());
         userEntity.setLastName(signupUserRequest.getLastName());
         userEntity.setUserName(signupUserRequest.getUserName());
@@ -71,14 +82,26 @@ public class UserController {
         userEntity.setPassword(signupUserRequest.getPassword());
         userEntity.setCountry(signupUserRequest.getCountry());
         userEntity.setContactNumber(signupUserRequest.getContactNumber());
+
+        // set Role to default nonadmin
         userEntity.setRole("nonadmin");
 
+        //Call signupBusinessService to create a new user Entity
         final UserEntity createdUserEntity = signupBusinessService.signup(userEntity);
+
+        //create response with create user uuid
         SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
+
         return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
 
     }
 
+    /*
+     * This endpoint is used to sign in or login user in the Quora Application.
+     * input - authorization field containing Basic + Base64 Encoded String of "user name:password"
+     *  output - Success - Auth Token with user uuid
+     *           Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.POST,
             path = "/user/signin",
@@ -87,24 +110,37 @@ public class UserController {
             @RequestHeader("authorization") final String authorization)
             throws AuthenticationFailedException {
 
+        //split and extract authorization base 64 code string from "authorization" field
         String[] base64EncodedString = authorization.split("Basic ");
 
+        //decode base64 string from a "authorization" field
         byte[] decodedArray = passwordCryptographyProvider.getBase64DecodedStringAsBytes(base64EncodedString[1]);
 
         String decodedString = new String(decodedArray);
 
+        //decoded string contain user name and password separated by ":"
         String[] decodedUserNamePassword = decodedString.split(":");
 
+        //call authenticationService service to generate user Auth Token for any further communication
         UserAuthTokenEntity userAuthToken = authenticationService.authenticateByUserNamePassword(decodedUserNamePassword[0], decodedUserNamePassword[1]);
 
+        //get userEntity from Auth Token
         UserEntity user = userAuthToken.getUser();
 
+        //send response with user uuid and access token in HttpHeader
         SigninResponse signinResponse = new SigninResponse().id(user.getUuid()).message("SIGNED IN SUCCESSFULLY");
         HttpHeaders headers = new HttpHeaders();
         headers.add("access_token", userAuthToken.getAccessToken());
+
         return new ResponseEntity<SigninResponse>(signinResponse, headers, HttpStatus.OK);
     }
 
+    /*
+     * This endpoint is used to signout user from the Quora Application.
+     * input - authorization field containing auth token generated from user sign-in
+     *  output - Success - with user uuid
+     *           Failure - Failure Code  with message.
+     */
     @RequestMapping(
             method = RequestMethod.POST,
             path = "/user/signout",
@@ -113,21 +149,26 @@ public class UserController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, SignOutRestrictedException {
 
-        //String accessToken = authorization.split("Bearer ")[1];
         UserAuthTokenEntity userAuthTokenEntity = null;
         try {
+            // Call authenticationService with access token came in authorization field.
             userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
         } catch(Exception e){
             throw new AuthorizationFailedException(errorCodeList[4],errorCodeMessage[4]);
         }
+
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
             throw new AuthorizationFailedException(errorCodeList[4],errorCodeMessage[4]);
         }
 
+        //Set logout time
         userAuthTokenEntity.setLogoutAt(ZonedDateTime.now());
 
+        //update userAuthTokenEntity with updated logout time.
         authenticationService.updateUserAuthToken(userAuthTokenEntity);
 
+        //create response with signed out user uuid
         SignoutResponse signoutResponse = new SignoutResponse().id(userAuthTokenEntity.getUser().getUuid()).message("SIGNED OUT SUCCESSFULLY");
         HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity<SignoutResponse>(signoutResponse, headers, HttpStatus.OK);
