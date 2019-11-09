@@ -40,10 +40,17 @@ public class AnswerDao {
             return null;
         }
     }
-
-    public List<AnswerEntity> getAllAnswers(final String questionUUid) {
+    public AnswerEntity getAnswerByUuid(final String uuid) {
         try {
-            return entityManager.createNamedQuery("AnswerEntityByUuid", AnswerEntity.class).setParameter("uuid", questionUUid).getResultList();
+            return entityManager.createNamedQuery("AnswerEntityByUuid", AnswerEntity.class).setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+    public List<AnswerEntity> getAllAnswersToQuestionId(final long questionId) {
+        try {
+            return entityManager.createNamedQuery("AnswerEntityById", AnswerEntity.class).setParameter("id", questionId).getResultList();
         } catch (NoResultException nre) {
             return null;
         }

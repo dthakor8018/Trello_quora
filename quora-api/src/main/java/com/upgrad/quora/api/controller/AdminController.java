@@ -1,7 +1,6 @@
 package com.upgrad.quora.api.controller;
 
 import com.upgrad.quora.api.model.UserDeleteResponse;
-import com.upgrad.quora.api.model.UserDetailsResponse;
 import com.upgrad.quora.service.business.AdminBusinessService;
 import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.CommonService;
@@ -17,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/")
