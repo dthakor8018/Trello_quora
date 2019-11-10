@@ -32,6 +32,15 @@ public class AnswerController {
 
   @Autowired private QuestionService questionService;
 
+    /*
+     * This endpoint is used to create a new answer in the Quora Application.
+     * input - answerRequest contain question id, answer content and
+     *  authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - AnswerResponse containing created answer uuid
+     *           Failure - Failure Code  with message.
+     */
+
   @RequestMapping(
           method = RequestMethod.POST,
           path = "/question/{questionId}/answer/create",
@@ -45,16 +54,20 @@ public class AnswerController {
 
       final QuestionEntity questionEntity = questionService.getQuestionByUuid(questionUuid);
 
+      // Checking whether the question exists in DB
       if ( questionEntity == null ) {
         throw new InvalidQuestionException("QUES-001","The question entered is invalid");
       }
 
+      // Call authenticationService with access token came in authorization field.
       UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+      // Token exist but user logged out already or token expired
       if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
         throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
       }
 
+      //Create and new answer entity and set answer content for the question
       final AnswerEntity answerEntity = new AnswerEntity();
       answerEntity.setAns(answerRequest.getAnswer());
       answerEntity.setUuid(UUID.randomUUID().toString());
@@ -67,6 +80,13 @@ public class AnswerController {
       return new ResponseEntity<AnswerResponse>(questionResponse, HttpStatus.CREATED);
   }
 
+    /*
+     * This endpoint is used to edit an existing answer.
+     * input - Existing answer id which needs to be edited and authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - Answer Edit Response
+     *           Failure - Failure Code  with message.
+     */
   @RequestMapping(
           method = RequestMethod.PUT,
           path = "/answer/edit/{answerId}",
@@ -78,12 +98,14 @@ public class AnswerController {
           @RequestHeader("authorization") final String authorization)
           throws AuthorizationFailedException, AnswerNotFoundException {
 
+         // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
-
+        // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
           throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit an answer");
         }
+
 
         final AnswerEntity answerEntity = answerService.getAnswerByUuid(answerUuid);
 
@@ -95,6 +117,7 @@ public class AnswerController {
             throw new AuthorizationFailedException("ATHR-003","Only the answer owner can edit the answer");
         }
 
+        //set content for the answer which needs to be edited in the answer entity
         answerEntity.setAns(content);
         AnswerEntity updatedAnswerEntity = answerService.updateAnswer(answerEntity);
         AnswerResponse answerDetailsResponse =
@@ -103,6 +126,13 @@ public class AnswerController {
         return new ResponseEntity<AnswerResponse>(answerDetailsResponse, HttpStatus.OK);
   }
 
+    /*
+     * This endpoint is used to delete an existing answer
+     * input - Answer id for the answer which needs to be deleted and authorization field containing auth token generated from user sign-in
+     *
+     *  output - Success - QuestionDetailsResponse for all the questions
+     *           Failure - Failure Code  with message.
+     */
   @RequestMapping(
           method = RequestMethod.DELETE,
           path = "/answer/delete/{answerId}",
@@ -112,8 +142,10 @@ public class AnswerController {
           @RequestHeader("authorization") final String authorization)
           throws AuthorizationFailedException, AnswerNotFoundException {
 
+      // Call authenticationService with access token came in authorization field.
       UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+      // Token exist but user logged out already or token expired
       if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
           throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to delete an answer");
       }
@@ -144,8 +176,10 @@ public class AnswerController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException {
 
+      // Call authenticationService with access token came in authorization field.
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
+      // Token exist but user logged out already or token expired
         if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
           throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get the answers");
         }
