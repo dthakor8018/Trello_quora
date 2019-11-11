@@ -158,7 +158,7 @@ public class UserController {
         }
 
         // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
             throw new AuthorizationFailedException(errorCodeList[4],errorCodeMessage[4]);
         }
 

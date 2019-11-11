@@ -59,7 +59,7 @@ public class QuestionController {
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post a question");
         }
 
@@ -103,7 +103,7 @@ public class QuestionController {
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
         }
 
@@ -143,7 +143,7 @@ public class QuestionController {
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit the question");
         }
 
@@ -192,7 +192,7 @@ public class QuestionController {
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to delete a question");
         }
 
@@ -234,7 +234,7 @@ public class QuestionController {
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
             throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get all questions");
         }
 

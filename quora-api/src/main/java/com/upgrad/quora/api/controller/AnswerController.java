@@ -63,7 +63,7 @@ public class AnswerController {
       UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
       // Token exist but user logged out already or token expired
-      if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+      if ( userAuthTokenEntity.getLogoutAt() != null ) {
         throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to post an answer");
       }
 
@@ -102,7 +102,7 @@ public class AnswerController {
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
         // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
           throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to edit an answer");
         }
 
@@ -146,7 +146,7 @@ public class AnswerController {
       UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
       // Token exist but user logged out already or token expired
-      if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+      if ( userAuthTokenEntity.getLogoutAt() != null ) {
           throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to delete an answer");
       }
 
@@ -180,7 +180,7 @@ public class AnswerController {
         UserAuthTokenEntity userAuthTokenEntity = authenticationService.authenticateByAccessToken(authorization);
 
       // Token exist but user logged out already or token expired
-        if ( userAuthTokenEntity.getLogoutAt() != null || ZonedDateTime.now().isBefore(userAuthTokenEntity.getExpiresAt()) ) {
+        if ( userAuthTokenEntity.getLogoutAt() != null ) {
           throw new AuthorizationFailedException("ATHR-002","User is signed out.Sign in first to get the answers");
         }
 
